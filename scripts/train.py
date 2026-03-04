@@ -56,7 +56,7 @@ def main():
     model, tokenizer = FastVisionModel.from_pretrained(
         model_name,
         max_seq_length=config["data"]["max_length"],
-        load_in_4bit=True,
+        load_in_4bit=False,
     )
 
     model = FastVisionModel.get_peft_model(
