@@ -13,6 +13,12 @@ DATA_DIR = Path("/efs/user_folders/dnshalam/datasets/lvis")
 
 
 def parse_bbox_from_response(response):
+    """Extract first bbox from model response. Supports both Qwen3 JSON and <box> formats."""
+    # Qwen3 JSON format: {"bbox_2d": [x1, y1, x2, y2], ...}
+    match = re.search(r'"bbox_2d"\s*:\s*\[(\d+),\s*(\d+),\s*(\d+),\s*(\d+)\]', response)
+    if match:
+        return [int(match.group(i)) for i in range(1, 5)]
+    # <box> format
     match = re.search(r'<box>\((\d+),(\d+)\),\((\d+),(\d+)\)</box>', response)
     if match:
         return [int(match.group(i)) for i in range(1, 5)]
