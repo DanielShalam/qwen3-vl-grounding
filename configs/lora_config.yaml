@@ -1,0 +1,38 @@
+# LoRA Configuration for Qwen3-VL Fine-tuning
+
+model_name: "Qwen/Qwen3-VL-8B-Instruct"
+
+lora:
+  r: 16  # Rank (try 16 or 32)
+  lora_alpha: 32
+  lora_dropout: 0.05
+  target_modules:
+    # Vision Transformer (ViT) linear layers
+    - "visual.transformer.*.mlp.fc1"
+    - "visual.transformer.*.mlp.fc2"
+    - "visual.transformer.*.attn.proj"
+    # LLM QKV attention projections
+    - "model.layers.*.self_attn.q_proj"
+    - "model.layers.*.self_attn.k_proj"
+    - "model.layers.*.self_attn.v_proj"
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+training:
+  output_dir: "./checkpoints"
+  num_train_epochs: 3
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 2e-4
+  warmup_steps: 100
+  logging_steps: 10
+  save_steps: 500
+  save_total_limit: 2
+  fp16: true
+  optim: "adamw_torch"
+  dataloader_num_workers: 4
+
+data:
+  train_file: "data/lvis_conversations.json"
+  max_length: 2048
+  image_size: 448
