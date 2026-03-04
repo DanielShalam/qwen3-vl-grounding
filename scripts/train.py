@@ -46,8 +46,8 @@ class LVISDataset(Dataset):
         ]}
 
 
-def main():
-    config = load_config()
+def main(config_path="configs/lora_config.yaml"):
+    config = load_config(config_path)
     model_name = config["model_name"]
     lora_cfg = config["lora"]
     train_cfg = config["training"]
@@ -111,4 +111,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", default="configs/lora_config.yaml")
+    args = parser.parse_args()
+    main(args.config)
