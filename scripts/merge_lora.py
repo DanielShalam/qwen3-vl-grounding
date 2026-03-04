@@ -1,6 +1,6 @@
 import torch
 import yaml
-from transformers import Qwen3ForConditionalGeneration, AutoProcessor
+from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 from peft import PeftModel
 
 def merge_lora_weights():
@@ -11,7 +11,7 @@ def merge_lora_weights():
     model_name = config["model_name"]
     print(f"Loading base model: {model_name}")
     
-    base_model = Qwen3ForConditionalGeneration.from_pretrained(
+    base_model = Qwen3VLForConditionalGeneration.from_pretrained(
         model_name,
         torch_dtype=torch.float16,
         device_map="auto"

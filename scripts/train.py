@@ -2,7 +2,7 @@ import yaml
 import torch
 from pathlib import Path
 from transformers import (
-    Qwen3ForConditionalGeneration,
+    Qwen3VLForConditionalGeneration,
     AutoProcessor,
     TrainingArguments,
     Trainer
@@ -34,7 +34,7 @@ def main():
     config = load_config("configs/lora_config.yaml")
     
     print(f"Loading model: {config['model_name']}")
-    model = Qwen3ForConditionalGeneration.from_pretrained(
+    model = Qwen3VLForConditionalGeneration.from_pretrained(
         config["model_name"],
         torch_dtype=torch.float16,
         device_map="auto"

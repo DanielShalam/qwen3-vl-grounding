@@ -6,7 +6,7 @@ import yaml
 from pathlib import Path
 from PIL import Image
 from tqdm import tqdm
-from transformers import Qwen3ForConditionalGeneration, AutoProcessor
+from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 from peft import PeftModel
 
 DATA_DIR = Path("/efs/user_folders/dnshalam/datasets/lvis")
@@ -27,7 +27,7 @@ def run_inference(mode="baseline", config_path="configs/lora_config.yaml", limit
     print(f"Loading model: {model_name}")
 
     processor = AutoProcessor.from_pretrained(model_name)
-    model = Qwen3ForConditionalGeneration.from_pretrained(
+    model = Qwen3VLForConditionalGeneration.from_pretrained(
         model_name, torch_dtype=torch.float16, device_map="auto"
     )
 
