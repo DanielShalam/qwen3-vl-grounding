@@ -1,18 +1,35 @@
 # Qwen3-VL Vision Grounding with LoRA Fine-tuning
 
-Fine-tuning Qwen3-VL for vision grounding on the LVIS dataset using LoRA.
+Fine-tuning Qwen3-VL-8B-Instruct for vision grounding on the LVIS dataset using LoRA.
 
 ## Project Structure
 ```
-├── data/                  # LVIS dataset and formatted conversations
-├── scripts/               # Executable scripts for each pipeline stage
-├── src/                   # Core modules
-├── configs/               # LoRA and training configurations
+├── scripts/
+│   ├── prepare_lvis.py       # Download & format LVIS into Qwen conversation JSON
+│   ├── run_inference.py       # Zero-shot / fine-tuned inference
+│   ├── evaluate.py            # IoU-based evaluation
+│   ├── train.py               # LoRA fine-tuning
+│   ├── merge_lora.py          # Merge LoRA weights into base model
+│   └── analyze_failures.py    # Qualitative failure analysis
+├── configs/
+│   └── lora_config.yaml       # LoRA and training configuration
 ├── results/
-│   ├── baseline/         # Zero-shot inference results
-│   ├── finetuned/        # Post-training results
-│   └── analysis/         # Qualitative failure analysis
-└── checkpoints/          # LoRA adapters and merged weights
+│   ├── baseline/              # Zero-shot inference results
+│   ├── finetuned/             # Post-training results
+│   └── analysis/              # Failure analysis outputs
+└── checkpoints/               # LoRA adapters and merged weights
+```
+
+## Data (EFS)
+Data is stored on shared EFS, not in the repo:
+- **COCO images**: `/efs/user_folders/dnshalam/datasets/coco2017/{train2017,val2017}/`
+- **LVIS conversations**: `/efs/user_folders/dnshalam/datasets/lvis/{lvis_train.json,lvis_validation.json}`
+- **HF cache**: `/efs/user_folders/dnshalam/datasets/.hf_cache/`
+
+## Setup
+```bash
+conda activate /efs/user_folders/dnshalam/envs/qwen3-vl
+pip install -r requirements.txt
 ```
 
 ## Pipeline
@@ -21,25 +38,25 @@ Fine-tuning Qwen3-VL for vision grounding on the LVIS dataset using LoRA.
 ```bash
 python scripts/prepare_lvis.py
 ```
-- Downloads LVIS dataset from HuggingFace
+- Downloads LVIS dataset from HuggingFace (`winvoker/lvis`)
 - Formats bounding boxes to Qwen format: `<box>(x1,y1),(x2,y2)</box>`
-- Converts to conversation JSON format
+- Maps images to local COCO paths on EFS
+- Outputs conversation JSONs per split
 
 ### 2. Zero-Shot Baseline
 ```bash
 python scripts/run_inference.py --mode baseline
 python scripts/evaluate.py --results results/baseline/predictions.json
 ```
-- Runs zero-shot inference on validation set
-- Computes IoU-based accuracy (threshold: IoU >= 0.5)
+Use `--limit N` to evaluate on a subset.
 
 ### 3. LoRA Fine-tuning
 ```bash
-python scripts/train.py --config configs/lora_config.yaml
+python scripts/train.py
 ```
-- LoRA rank: r=16 or r=32
-- Targets: ViT linear layers + LLM QKV projections
-- Training: 2-3 epochs
+- Model: `Qwen/Qwen3-VL-8B-Instruct`
+- LoRA targets: ViT linear layers + LLM QKV projections
+- Config: `configs/lora_config.yaml`
 
 ### 4. Post-Training Evaluation
 ```bash
@@ -50,15 +67,7 @@ python scripts/evaluate.py --results results/finetuned/predictions.json
 
 ### 5. Failure Analysis
 ```bash
-python scripts/analyze_failures.py
-```
-- Boundary regression errors vs. hallucinations
-- Visualizations and error categorization
-
-## Setup
-```bash
-conda activate /efs/user_folders/dnshalam/envs/<your-env-name>
-pip install -r requirements.txt
+python scripts/analyze_failures.py --results results/finetuned/predictions.json
 ```
 
 ## Metrics
