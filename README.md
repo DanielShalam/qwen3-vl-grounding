@@ -70,6 +70,13 @@ python scripts/evaluate.py --results results/finetuned/predictions.json
 python scripts/analyze_failures.py --results results/finetuned/predictions.json
 ```
 
+## Results
+
+| Model | Mode | Samples | Mean IoU | Acc (IoU≥0.5) | Failed Parse |
+|-------|------|---------|----------|---------------|--------------|
+| Qwen3-VL-8B-Instruct | Zero-shot | 1,000 | 0.2456 | 25.6% | 0.5% |
+| Qwen3-VL-8B-Instruct | LoRA fine-tuned | - | - | - | - |
+
 ## Metrics
 - Primary: IoU >= 0.5 accuracy
 - Secondary: Mean IoU, precision/recall at various thresholds
