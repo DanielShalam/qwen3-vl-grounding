@@ -5,7 +5,7 @@ Fine-tuning Qwen3-VL-8B-Instruct for vision grounding on the LVIS dataset using 
 ## Project Structure
 ```
 ├── scripts/
-│   ├── prepare_lvis.py       # Download & format LVIS into Qwen conversation JSON
+│   ├── prepare_lvis.py       # Format LVIS annotations into conversation JSON
 │   ├── run_inference.py       # Zero-shot / fine-tuned inference
 │   ├── evaluate.py            # IoU-based evaluation
 │   ├── train.py               # LoRA fine-tuning
@@ -23,8 +23,8 @@ Fine-tuning Qwen3-VL-8B-Instruct for vision grounding on the LVIS dataset using 
 ## Data (EFS)
 Data is stored on shared EFS, not in the repo:
 - **COCO images**: `/efs/user_folders/dnshalam/datasets/coco2017/{train2017,val2017}/`
-- **LVIS conversations**: `/efs/user_folders/dnshalam/datasets/lvis/{lvis_train.json,lvis_validation.json}`
-- **HF cache**: `/efs/user_folders/dnshalam/datasets/.hf_cache/`
+- **LVIS raw annotations**: `/efs/user_folders/dnshalam/datasets/lvis/{lvis_v1_train.json,lvis_v1_val.json}`
+- **Formatted conversations**: `/efs/user_folders/dnshalam/datasets/lvis/{lvis_train.json,lvis_validation.json}`
 
 ## Setup
 ```bash
@@ -38,17 +38,17 @@ pip install -r requirements.txt
 ```bash
 python scripts/prepare_lvis.py
 ```
-- Downloads LVIS dataset from HuggingFace (`winvoker/lvis`)
-- Formats bounding boxes to Qwen format: `<box>(x1,y1),(x2,y2)</box>`
+- Reads LVIS v1 annotation JSONs (downloaded from Facebook's LVIS release)
+- Normalizes bounding boxes to Qwen's 0-1000 coordinate system
 - Maps images to local COCO paths on EFS
-- Outputs conversation JSONs per split
+- Outputs conversation JSONs per split (train: 1.27M, val: 244K annotations)
 
 ### 2. Zero-Shot Baseline
 ```bash
 python scripts/run_inference.py --mode baseline
 python scripts/evaluate.py --results results/baseline/predictions.json
 ```
-Use `--limit N` to evaluate on a subset.
+Use `--limit N` to evaluate on a subset. Model outputs bboxes in `{"bbox_2d": [x1, y1, x2, y2]}` format.
 
 ### 3. LoRA Fine-tuning
 ```bash
