@@ -26,10 +26,16 @@ def evaluate(predictions_file, threshold=0.5):
     
     ious = []
     correct = 0
+    failed_parse = 0
     
     for pred in predictions:
         gt_box = pred["ground_truth_box"]
         pred_box = pred["predicted_box"]
+        
+        if gt_box is None or pred_box is None:
+            failed_parse += 1
+            ious.append(0.0)
+            continue
         
         iou = calculate_iou(gt_box, pred_box)
         ious.append(iou)
@@ -41,6 +47,7 @@ def evaluate(predictions_file, threshold=0.5):
     mean_iou = sum(ious) / len(ious) if ious else 0
     
     print(f"Total samples: {len(predictions)}")
+    print(f"Failed to parse: {failed_parse} ({failed_parse/len(predictions)*100:.1f}%)")
     print(f"Mean IoU: {mean_iou:.4f}")
     print(f"Accuracy (IoU >= {threshold}): {accuracy:.4f} ({correct}/{len(predictions)})")
     
