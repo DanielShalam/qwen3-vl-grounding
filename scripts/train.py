@@ -1,7 +1,9 @@
 import json
+import re
 import yaml
 from pathlib import Path
 from PIL import Image
+from torch.utils.data import Dataset
 from unsloth import FastVisionModel
 from unsloth.trainer import UnslothVisionDataCollator
 from trl import SFTTrainer, SFTConfig
@@ -14,26 +16,24 @@ def load_config(config_path="configs/lora_config.yaml"):
         return yaml.safe_load(f)
 
 
-def load_dataset(data_file):
-    """Load LVIS conversation JSON and convert to Unsloth vision format."""
-    with open(data_file) as f:
-        data = json.load(f)
+class LVISDataset(Dataset):
+    """Lazy-loading dataset - only opens images when accessed."""
 
-    dataset = []
-    for item in data:
-        image_path = item["image"]
-        human_msg = item["conversations"][0]["value"]
-        # Extract prompt text without <img> tags
-        import re
-        prompt_text = re.sub(r'<img>.*?</img>\n', '', human_msg)
+    def __init__(self, data_file):
+        with open(data_file) as f:
+            self.data = json.load(f)
+        print(f"Loaded {len(self.data)} samples from {data_file}")
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        item = self.data[idx]
+        prompt_text = re.sub(r'<img>.*?</img>\n', '', item["conversations"][0]["value"])
         answer = item["conversations"][1]["value"]
+        image = Image.open(item["image"]).convert("RGB")
 
-        try:
-            image = Image.open(image_path).convert("RGB")
-        except Exception as e:
-            continue
-
-        dataset.append({"messages": [
+        return {"messages": [
             {"role": "user", "content": [
                 {"type": "image", "image": image},
                 {"type": "text", "text": prompt_text},
@@ -41,10 +41,7 @@ def load_dataset(data_file):
             {"role": "assistant", "content": [
                 {"type": "text", "text": answer},
             ]},
-        ]})
-
-    print(f"Loaded {len(dataset)} samples")
-    return dataset
+        ]}
 
 
 def main():
@@ -76,7 +73,7 @@ def main():
     )
 
     print("Loading training data...")
-    train_dataset = load_dataset(DATA_DIR / "lvis_train.json")
+    train_dataset = LVISDataset(DATA_DIR / "lvis_train.json")
 
     trainer = SFTTrainer(
         model=model,
@@ -93,8 +90,7 @@ def main():
             logging_steps=train_cfg["logging_steps"],
             save_steps=train_cfg["save_steps"],
             save_total_limit=train_cfg["save_total_limit"],
-            fp16=not train_cfg.get("bf16", False),
-            bf16=train_cfg.get("bf16", False),
+            bf16=True,
             optim=train_cfg["optim"],
             dataloader_num_workers=train_cfg["dataloader_num_workers"],
             remove_unused_columns=False,
