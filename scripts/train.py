@@ -19,9 +19,11 @@ def load_config(config_path="configs/lora_config.yaml"):
 class LVISDataset(Dataset):
     """Lazy-loading dataset - only opens images when accessed."""
 
-    def __init__(self, data_file):
+    def __init__(self, data_file, max_samples=None):
         with open(data_file) as f:
             self.data = json.load(f)
+        if max_samples:
+            self.data = self.data[:max_samples]
         print(f"Loaded {len(self.data)} samples from {data_file}")
 
     def __len__(self):
@@ -73,7 +75,7 @@ def main():
     )
 
     print("Loading training data...")
-    train_dataset = LVISDataset(DATA_DIR / "lvis_train.json")
+    train_dataset = LVISDataset(DATA_DIR / "lvis_train.json", max_samples=config["data"].get("max_samples"))
 
     trainer = SFTTrainer(
         model=model,
