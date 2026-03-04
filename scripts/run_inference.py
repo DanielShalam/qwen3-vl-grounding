@@ -70,7 +70,7 @@ def run_inference(mode="baseline", config_path="configs/lora_config.yaml", limit
         ]
 
         text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        inputs = processor(text=[text], images=[image], return_tensors="pt", padding=True).to(model.device)
+        inputs = processor(text=[text], images=[image], return_tensors="pt").to(model.device)
 
         with torch.no_grad():
             outputs = model.generate(**inputs, max_new_tokens=128)
