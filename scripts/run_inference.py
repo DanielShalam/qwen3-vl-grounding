@@ -25,7 +25,7 @@ def parse_bbox_from_response(response):
     return None
 
 
-def run_inference(mode="baseline", config_path="configs/lora_config.yaml", limit=None):
+def run_inference(mode="baseline", config_path="configs/lora_config.yaml", limit=None, adapter_path="checkpoints/final", output_dir=None):
     with open(config_path) as f:
         config = yaml.safe_load(f)
 
@@ -38,8 +38,8 @@ def run_inference(mode="baseline", config_path="configs/lora_config.yaml", limit
     )
 
     if mode == "finetuned":
-        print("Loading LoRA adapter...")
-        model = PeftModel.from_pretrained(model, "checkpoints/final")
+        print(f"Loading LoRA adapter from {adapter_path}...")
+        model = PeftModel.from_pretrained(model, adapter_path)
 
     model.eval()
 
@@ -86,9 +86,9 @@ def run_inference(mode="baseline", config_path="configs/lora_config.yaml", limit
             "response": response,
         })
 
-    output_dir = Path(f"results/{mode}")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / "predictions.json"
+    out_dir = Path(output_dir) if output_dir else Path(f"results/{mode}")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    output_file = out_dir / "predictions.json"
 
     with open(output_file, "w") as f:
         json.dump(predictions, f, indent=2)
@@ -101,6 +101,8 @@ if __name__ == "__main__":
     parser.add_argument("--mode", choices=["baseline", "finetuned"], default="baseline")
     parser.add_argument("--config", default="configs/lora_config.yaml")
     parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--adapter", default="checkpoints/final", help="Path to LoRA adapter")
+    parser.add_argument("--output_dir", default=None, help="Custom output directory")
     args = parser.parse_args()
 
-    run_inference(args.mode, args.config, args.limit)
+    run_inference(args.mode, args.config, args.limit, args.adapter, args.output_dir)
