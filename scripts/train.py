@@ -1,5 +1,4 @@
 import json
-import re
 import yaml
 from pathlib import Path
 from PIL import Image
@@ -31,7 +30,7 @@ class LVISDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.data[idx]
-        prompt_text = re.sub(r'<img>.*?</img>\n', '', item["conversations"][0]["value"])
+        prompt_text = item["conversations"][0]["value"]
         answer = item["conversations"][1]["value"]
         image = Image.open(item["image"]).convert("RGB")
 

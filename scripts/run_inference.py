@@ -54,7 +54,7 @@ def run_inference(mode="baseline", config_path="configs/lora_config.yaml", limit
 
     for item in tqdm(data):
         image_path = item["image"]
-        prompt_text = re.sub(r'<img>.*?</img>\n', '', item["conversations"][0]["value"])
+        prompt_text = item["conversations"][0]["value"]
 
         try:
             image = Image.open(image_path).convert("RGB")

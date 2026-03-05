@@ -13,20 +13,17 @@ SPLIT_CONFIG = {
 
 
 def format_bbox_to_qwen(bbox, img_width, img_height):
-    """Convert LVIS bbox [x, y, width, height] to Qwen normalized format"""
+    """Convert LVIS bbox [x, y, width, height] to Qwen3 native bbox_2d format"""
     x, y, w, h = bbox
     x1_norm = int((x / img_width) * 1000)
     y1_norm = int((y / img_height) * 1000)
     x2_norm = int(((x + w) / img_width) * 1000)
     y2_norm = int(((y + h) / img_height) * 1000)
-    return f"<box>({x1_norm},{y1_norm}),({x2_norm},{y2_norm})</box>"
+    return [x1_norm, y1_norm, x2_norm, y2_norm]
 
 
 def process_split(split_name):
     output_file = OUTPUT_DIR / f"lvis_{split_name}.json"
-    if output_file.exists():
-        print(f"Skipping {split_name} - already exists at {output_file}")
-        return
 
     config = SPLIT_CONFIG[split_name]
     print(f"\nLoading LVIS {split_name} annotations...")
@@ -46,13 +43,14 @@ def process_split(split_name):
         image_path = str(config["images_dir"] / filename)
         category = categories[ann["category_id"]]
 
-        bbox_str = format_bbox_to_qwen(ann["bbox"], img_w, img_h)
+        bbox = format_bbox_to_qwen(ann["bbox"], img_w, img_h)
+        answer = json.dumps([{"bbox_2d": bbox, "label": category}])
         conversations.append({
             "id": ann["image_id"],
             "image": image_path,
             "conversations": [
-                {"from": "human", "value": f"<img>{image_path}</img>\nLocate the {category} in this image."},
-                {"from": "gpt", "value": f"The {category} is located at {bbox_str}"},
+                {"from": "human", "value": f"Locate the {category} in this image."},
+                {"from": "gpt", "value": answer},
             ],
         })
 
