@@ -44,12 +44,12 @@ def process_split(split_name):
         category = categories[ann["category_id"]]
 
         bbox = format_bbox_to_qwen(ann["bbox"], img_w, img_h)
-        answer = json.dumps([{"bbox_2d": bbox, "label": category}])
+        answer = json.dumps({"bbox_2d": bbox})
         conversations.append({
             "id": ann["image_id"],
             "image": image_path,
             "conversations": [
-                {"from": "human", "value": f"Locate the {category} in this image."},
+                {"from": "human", "value": f"<image>\nLocate {category} in this image and output the bbox coordinates in JSON format."},
                 {"from": "gpt", "value": answer},
             ],
         })
