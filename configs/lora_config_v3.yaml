@@ -24,6 +24,6 @@ training:
   dataloader_num_workers: 4
 
 data:
-  train_file: "data/lvis_conversations.json"
+  train_file: "/efs/user_folders/dnshalam/datasets/lvis/lvis_train.json"
   max_length: 4096
   max_samples: 100000
