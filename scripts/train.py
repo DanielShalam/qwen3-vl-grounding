@@ -74,7 +74,7 @@ def main(config_path="configs/lora_config.yaml"):
     )
 
     print("Loading training data...")
-    train_dataset = LVISDataset(DATA_DIR / "lvis_train.json", max_samples=config["data"].get("max_samples"))
+    train_dataset = LVISDataset(config["data"].get("train_file", str(DATA_DIR / "lvis_train.json")), max_samples=config["data"].get("max_samples"))
 
     trainer = SFTTrainer(
         model=model,
