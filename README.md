@@ -76,6 +76,7 @@ python scripts/analyze_failures.py --results results/finetuned/predictions.json
 |-------|------|---------|----------|---------------|--------------|
 | Qwen3-VL-8B-Instruct | Zero-shot | 1,000 | 0.5973 | 63.3% | 0.5% |
 | Qwen3-VL-8B-Instruct | LoRA 3ep (100K samples) | 1,000 | 0.6076 | 65.6% | 0.0% |
+| Qwen3-VL-8B-Instruct | LoRA ~2.7ep (500K samples) | 1,000 | 0.6060 | 64.7% | 0.0% |
 
 ## Metrics
 - Primary: IoU >= 0.5 accuracy
