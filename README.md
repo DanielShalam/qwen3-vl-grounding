@@ -78,6 +78,13 @@ python scripts/analyze_failures.py --results results/finetuned/predictions.json
 | Qwen3-VL-8B-Instruct | LoRA 3ep (100K samples) | 1,000 | 0.6076 | 65.6% | 0.0% |
 | Qwen3-VL-8B-Instruct | LoRA ~2.7ep (500K samples) | 1,000 | 0.6060 | 64.7% | 0.0% |
 
+### Multi-Instance Evaluation (Hungarian Matching)
+
+| Setup | Images | GT Boxes | Pred Boxes | Mean IoU | Recall@0.5 | Precision@0.5 | F1@0.5 |
+|-------|--------|----------|------------|----------|------------|---------------|--------|
+| Zero-shot (grouped, single-class) | 1,000 | 3,040 | 1,716 | 0.358 | 40.4% | 71.5% | 51.6% |
+| Zero-shot (multiclass, per-image) | 500 | 5,154 | 3,330 | 0.365 | 41.1% | 63.5% | 49.9% |
+
 ## Metrics
 - Primary: IoU >= 0.5 accuracy
 - Secondary: Mean IoU, precision/recall at various thresholds
