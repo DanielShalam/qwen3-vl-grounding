@@ -81,10 +81,23 @@ python scripts/analyze_failures.py --results results/finetuned/predictions.json
 
 ### Multi-Instance Evaluation (Hungarian Matching)
 
-| Setup | Images | GT Boxes | Pred Boxes | Mean IoU | Recall@0.5 | Precision@0.5 | F1@0.5 |
-|-------|--------|----------|------------|----------|------------|---------------|--------|
-| Zero-shot (grouped, single-class) | 1,000 | 3,040 | 1,716 | 0.358 | 40.4% | 71.5% | 51.6% |
-| Zero-shot (multiclass, per-image) | 500 | 5,154 | 3,330 | 0.365 | 41.1% | 63.5% | 49.9% |
+Evaluation uses per-category Hungarian matching to optimally assign predicted boxes to GT boxes.
+
+**Impact of max generation tokens:** With many objects per image (~12.5 avg), the model's response
+can be truncated if `max_new_tokens` is too low. This directly affects recall since truncated
+responses miss objects at the end.
+
+| Setup | max_tokens | Pred Boxes | Mean IoU | Recall@0.5 | Precision@0.5 | F1@0.5 |
+|-------|-----------|-----------|----------|------------|---------------|--------|
+| Zero-shot multiclass (500 imgs) | 1024 | 3,330 | 0.365 | 41.1% | 63.5% | 49.9% |
+| Zero-shot multiclass (500 imgs) | 4096 | 4,469 | 0.382 | 42.1% | 48.6% | 45.1% |
+| Zero-shot grouped single-class (1K) | 1024 | 1,716 | 0.358 | 40.4% | 71.5% | 51.6% |
+
+Key observations:
+- Increasing tokens from 1024→4096 yields 34% more predictions but only marginal recall gain (+1%)
+- The model naturally outputs ~30 boxes before stopping, even with higher token budget
+- Single-class prompts achieve higher precision (71.5%) since the model focuses on one category
+- Multiclass prompts find more objects overall but with lower precision due to cross-class confusion
 
 ## Metrics
 - Primary: IoU >= 0.5 accuracy
