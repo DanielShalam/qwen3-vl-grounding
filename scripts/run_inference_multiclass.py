@@ -72,7 +72,7 @@ def run_inference(mode="baseline", config_path="configs/lora_config.yaml", limit
         inputs = processor(text=[text], images=[image], return_tensors="pt").to(model.device)
 
         with torch.no_grad():
-            outputs = model.generate(**inputs, max_new_tokens=1024)
+            outputs = model.generate(**inputs, max_new_tokens=4096)
 
         response = processor.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=False)
 
@@ -81,6 +81,7 @@ def run_inference(mode="baseline", config_path="configs/lora_config.yaml", limit
 
         predictions.append({
             "id": item["id"],
+            "image": item["image"],
             "categories": item["categories"],
             "num_gt": len(gt_boxes),
             "num_pred": len(pred_boxes),
