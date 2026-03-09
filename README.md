@@ -75,8 +75,9 @@ python scripts/analyze_failures.py --results results/finetuned/predictions.json
 | Model | Mode | Samples | Mean IoU | Acc (IoU≥0.5) | Failed Parse |
 |-------|------|---------|----------|---------------|--------------|
 | Qwen3-VL-8B-Instruct | Zero-shot | 1,000 | 0.5973 | 63.3% | 0.5% |
-| Qwen3-VL-8B-Instruct | LoRA 3ep (100K samples) | 1,000 | 0.6076 | 65.6% | 0.0% |
-| Qwen3-VL-8B-Instruct | LoRA ~2.7ep (500K samples) | 1,000 | 0.6060 | 64.7% | 0.0% |
+| Qwen3-VL-8B-Instruct | LoRA 3ep, lr=2e-4 (100K) | 1,000 | 0.6076 | 65.6% | 0.0% |
+| Qwen3-VL-8B-Instruct | LoRA ~2.7ep, lr=2e-4 (500K) | 1,000 | 0.6060 | 64.7% | 0.0% |
+| Qwen3-VL-8B-Instruct | LoRA 3ep, lr=1e-6, Qwen-aligned (100K) | 1,000 | 0.6122 | 65.3% | 0.0% |
 
 ### Multi-Instance Evaluation (Hungarian Matching)
 
