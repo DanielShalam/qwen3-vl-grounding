@@ -93,6 +93,15 @@ responses miss objects at the end.
 | Zero-shot multiclass (500 imgs) | 4096 | 4,469 | 38.2% | 65.0% | 42.1% | 48.6% | 45.1% |
 | Zero-shot grouped single-class (1K) | 1024 | 1,716 | 35.8% | - | 40.4% | 71.5% | 51.6% |
 
+**Metric definitions:**
+- **Mean IoU**: Average IoU across all matched GT-prediction pairs (unmatched GT counted as 0)
+- **Img Acc@0.5**: Per-image accuracy — mean fraction of GT boxes correctly detected per image
+- **Recall@0.5**: Fraction of all GT boxes matched with IoU ≥ 0.5 (= mIoU@50)
+- **Precision@0.5**: Fraction of all predicted boxes that matched a GT box with IoU ≥ 0.5
+- **F1@0.5**: Harmonic mean of Recall and Precision at IoU ≥ 0.5
+
+Matching uses per-category Hungarian assignment: a predicted "chair" can only match a GT "chair".
+
 Key observations:
 - Increasing tokens from 1024→4096 yields 34% more predictions but only marginal recall gain (+1%)
 - The model naturally outputs ~30 boxes before stopping, even with higher token budget
