@@ -87,11 +87,11 @@ Evaluation uses per-category Hungarian matching to optimally assign predicted bo
 can be truncated if `max_new_tokens` is too low. This directly affects recall since truncated
 responses miss objects at the end.
 
-| Setup | max_tokens | Pred Boxes | Mean IoU | Recall@0.5 | Precision@0.5 | F1@0.5 |
-|-------|-----------|-----------|----------|------------|---------------|--------|
-| Zero-shot multiclass (500 imgs) | 1024 | 3,330 | 0.365 | 41.1% | 63.5% | 49.9% |
-| Zero-shot multiclass (500 imgs) | 4096 | 4,469 | 0.382 | 42.1% | 48.6% | 45.1% |
-| Zero-shot grouped single-class (1K) | 1024 | 1,716 | 0.358 | 40.4% | 71.5% | 51.6% |
+| Setup | max_tokens | Pred Boxes | Mean IoU | Img Acc@0.5 | Recall@0.5 | Precision@0.5 | F1@0.5 |
+|-------|-----------|-----------|----------|-------------|------------|---------------|--------|
+| Zero-shot multiclass (500 imgs) | 1024 | 3,330 | 36.5% | 65.1% | 41.1% | 63.5% | 49.9% |
+| Zero-shot multiclass (500 imgs) | 4096 | 4,469 | 38.2% | 65.0% | 42.1% | 48.6% | 45.1% |
+| Zero-shot grouped single-class (1K) | 1024 | 1,716 | 35.8% | - | 40.4% | 71.5% | 51.6% |
 
 Key observations:
 - Increasing tokens from 1024→4096 yields 34% more predictions but only marginal recall gain (+1%)
