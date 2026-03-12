@@ -31,3 +31,11 @@ Thumbs.db
 # Logs
 *.log
 wandb/
+
+# Additional checkpoints and cache
+checkpoints_*/
+unsloth_compiled_cache/
+qwen3-vl-official/
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+notebooks/figures/
