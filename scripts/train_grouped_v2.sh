@@ -1,31 +1,23 @@
 #!/bin/bash
-# Train Qwen3-VL on grouped single-class grounding data (v2)
-
 MASTER_ADDR="127.0.0.1"
 MASTER_PORT=$(shuf -i 20000-29999 -n 1)
-NPROC_PER_NODE=4
-
-MODEL_PATH="Qwen/Qwen3-VL-8B-Instruct"
-OUTPUT_DIR="./checkpoints_grouped_v2"
-CACHE_DIR="./cache"
-DATASETS="lvis_grouped_v2"
-
+ENV="/efs/user_folders/dnshalam/envs/qwen-finetune-p5/bin"
 cd /efs/user_folders/dnshalam/projects/qwen3-vl-grounding
 
-/efs/user_folders/dnshalam/envs/qwen3-vl/bin/torchrun --nproc_per_node=$NPROC_PER_NODE \
+$ENV/torchrun --nproc_per_node=2 \
          --master_addr=$MASTER_ADDR \
          --master_port=$MASTER_PORT \
          qwen3-vl-official/qwen-vl-finetune/qwenvl/train/train_qwen.py \
-         --model_name_or_path $MODEL_PATH \
-         --dataset_use $DATASETS \
+         --model_name_or_path "Qwen/Qwen3-VL-8B-Instruct" \
+         --dataset_use lvis_grouped_v2 \
          --tune_mm_llm True \
          --tune_mm_vision False \
-         --tune_mm_mlp False \
-         --output_dir $OUTPUT_DIR \
-         --cache_dir $CACHE_DIR \
+         --tune_mm_mlp True \
+         --output_dir ./checkpoints_grouped_v2 \
+         --cache_dir /tmp/dnshalam_cache \
          --bf16 \
          --per_device_train_batch_size 2 \
-         --gradient_accumulation_steps 8 \
+         --gradient_accumulation_steps 16 \
          --learning_rate 1e-6 \
          --optim adamw_torch \
          --model_max_length 4096 \
